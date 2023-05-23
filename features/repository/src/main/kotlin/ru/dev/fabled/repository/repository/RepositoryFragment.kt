@@ -24,6 +24,8 @@ import ru.dev.fabled.domain.model.Resource
 import ru.dev.fabled.repository.databinding.FragmentRepositoryBinding
 import ru.dev.fabled.repository.repository.adapters.RepositoryContentListAdapter
 
+private const val WEB_URL_KEY = "web_url"
+
 /**
  * This fragment shows repository content and can show files from it in web view
  */
@@ -71,19 +73,19 @@ class RepositoryFragment :
         return binding.root
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        activity?.onBackPressedDispatcher?.addCallback(onBackPressedCallback)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val (state, effect) = use(viewModel)
 
         observeState(state)
         collectEffects(effect)
 
-        initUi()
+        initUi(webUrl = savedInstanceState?.getString(WEB_URL_KEY))
         setupListeners()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        activity?.onBackPressedDispatcher?.addCallback(onBackPressedCallback)
     }
 
     override fun observeState(state: StateFlow<RepositoryScreenContract.State>) =
@@ -118,8 +120,9 @@ class RepositoryFragment :
         repeatOnLifecycleWithScope(state = Lifecycle.State.STARTED) {
             effect.collectLatest {
                 when (it) {
-                    is RepositoryScreenContract.Effect.OpenFile ->
+                    is RepositoryScreenContract.Effect.OpenFile -> {
                         binding.filedWebView.loadUrl(it.fileUrl)
+                    }
                 }
             }
         }
@@ -127,7 +130,7 @@ class RepositoryFragment :
     /**
      * Sets initial parameters to views like adapters, decorations etc.
      */
-    private fun initUi() = with(binding) {
+    private fun initUi(webUrl: String?) = with(binding) {
         repositoryContentList.apply {
             setHasFixedSize(true)
             addItemDecoration(DividerItemDecoration(context, RecyclerView.VERTICAL))
@@ -139,11 +142,13 @@ class RepositoryFragment :
             useWideViewPort = true
         }
 
+        webUrl?.let { filedWebView.loadUrl(it) }
+
         progressBar.max = 100
     }
 
     private fun setupListeners() = with(binding) {
-        retryButton.setOnClickListener { viewModel.onEvent(ru.dev.fabled.repository.repository.RepositoryScreenContract.Event.Retry) }
+        retryButton.setOnClickListener { viewModel.onEvent(RepositoryScreenContract.Event.Retry) }
     }
 
     /**
@@ -218,6 +223,11 @@ class RepositoryFragment :
         errorMessage.text = ""
 
         repositoryContentList.isVisible = true
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(WEB_URL_KEY, binding.filedWebView.url)
     }
 
     override fun onDestroy() {
