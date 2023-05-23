@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="bad_request_message">Bad request. Please, try again later or enter new search request</string>
+    <string name="server_error_message">Server error. Please, try again later</string>
+    <string name="unknown_network_exception">Unknown network error. Please, try again</string>
+    <string name="no_internet_message">No Internet connection</string>
+</resources>

@@ -1,0 +1,8 @@
+<resources>
+    <!-- Base application theme. -->
+    <style name="Base.Theme.GithubApp" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="solidText">@color/black</item>
+    </style>
+
+    <style name="Theme.GithubApp" parent="Base.Theme.GithubApp" />
+</resources>

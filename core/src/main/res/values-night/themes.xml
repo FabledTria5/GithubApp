@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Base.Theme.GithubApp" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="solidText">@color/white</item>
+    </style>
+</resources>
